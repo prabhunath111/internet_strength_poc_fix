@@ -88,13 +88,25 @@ final class SignalStreamHandler: NSObject, FlutterStreamHandler {
         var level = 0
 
         if path.status == .satisfied {
-            level = 4
             if path.usesInterfaceType(.wifi) {
                 type = "wifi"
             } else if path.usesInterfaceType(.cellular) {
                 type = "cellular"
             } else {
                 type = "other"
+            }
+
+            // Heuristic Level:
+            // 4: Optimal (WiFi, not expensive, not constrained)
+            // 3: Good (Cellular or expensive hotspot)
+            // 2: Fair (Low Data Mode / Constrained)
+            // 1: Weak (Satisfied but potentially poor - reserved for future)
+            if path.isConstrained {
+                level = 2
+            } else if path.isExpensive {
+                level = 3
+            } else {
+                level = 4
             }
         }
 
