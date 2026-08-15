@@ -12,10 +12,11 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
+    let registrar = self.registrar(forPlugin: "SignalStrength")
+    let messenger = registrar!.messenger()
 
     let methodChannel = FlutterMethodChannel(name: "com.fluttercon/signal",
-                                              binaryMessenger: controller.binaryMessenger)
+                                              binaryMessenger: messenger)
     methodChannel.setMethodCallHandler({ [weak self]
       (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
       if call.method == "getSignalStrength" {
@@ -26,7 +27,7 @@ import UIKit
     })
 
     let eventChannel = FlutterEventChannel(name: "com.fluttercon/signal_stream",
-                                            binaryMessenger: controller.binaryMessenger)
+                                            binaryMessenger: messenger)
     eventChannel.setStreamHandler(signalHandler)
 
     GeneratedPluginRegistrant.register(with: self)
